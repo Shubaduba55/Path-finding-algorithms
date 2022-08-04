@@ -1,0 +1,10 @@
+﻿  Graph.cpp
+C:\KR\PathFinding\PathFinding\Graph.cpp(32,9): warning C4018: '>': signed/unsigned mismatch
+C:\KR\PathFinding\PathFinding\Graph.cpp(38,21): warning C4018: '<': signed/unsigned mismatch
+C:\KR\PathFinding\PathFinding\Graph.cpp(63,20): warning C4018: '<': signed/unsigned mismatch
+C:\KR\PathFinding\PathFinding\Graph.cpp(186,22): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\KR\PathFinding\PathFinding\Graph.cpp(186,19): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\KR\PathFinding\PathFinding\Graph.cpp(198,70): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\KR\PathFinding\PathFinding\Graph.cpp(200,64): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\KR\PathFinding\PathFinding\Graph.cpp(66): warning C4715: 'Graph::get_node': not all control paths return a value
+  PathFinding.vcxproj -> C:\KR\PathFinding\Debug\PathFinding.exe
