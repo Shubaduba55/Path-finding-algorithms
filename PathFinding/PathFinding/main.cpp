@@ -12,10 +12,10 @@ int factorial_sum(int num){
 
 int main() {
 	Graph graph;
-	graph.create_graph(36);
+	graph.create_graph(100);
 	
 	//graph.print();
-	graph.find_path(0, 1295);
+	graph.find_path(0, 8556);
 	return 0; 
 }
 

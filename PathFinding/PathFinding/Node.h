@@ -14,11 +14,12 @@ private:
 	int static counter;
 
 	int m_id;
-	Point m_coordinate;
+	Point m_coordinate; 
 	int connections;
 
 	bool is_visited;
 	float reach_value;
+	float heuristic_value;
 	Node* previous;
 
 public:
@@ -36,6 +37,9 @@ public:
 
 	float get_reach_val();
 	void set_reach_val(float);
+
+	float get_heuristic_val();
+	void set_heuristic_val(float);
 
 	Node* get_prev_node();
 	void set_prev_node(Node*);

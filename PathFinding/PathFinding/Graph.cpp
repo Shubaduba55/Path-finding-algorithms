@@ -70,11 +70,11 @@ Node* Graph::find_min_node()
 	float value = INF;
 	Node* tmp = nullptr;
 	for (Node& elem : m_nodes) {
-		if (!elem.get_status() && value > elem.get_reach_val()) {
+		if (!elem.get_status() && value > ( elem.get_reach_val() + elem.get_heuristic_val() ) ) {
 			tmp = &elem;
-			value = elem.get_reach_val();
+			value = elem.get_reach_val() + elem.get_heuristic_val();
 		}
-	}
+	} 
 
 	//Error: tmp == nullptr then it is not reachable
 	return tmp;
@@ -106,10 +106,12 @@ void Graph::run_through_neighbours(Node* node, Node* end_n, function<float(Node*
 			neighbours_to_visit--;
 
 			Node& neighbour = this->get_node(neighbour_id);
-			float new_reach_val = node->get_reach_val() + edge_wght + heuristic(&neighbour, end_n);
+			float new_reach_val = node->get_reach_val() + edge_wght;
+			//float new_heuristic_val = heuristic(&neighbour, end_n);
 
 			if (neighbour.get_reach_val() > new_reach_val) {
 				neighbour.set_reach_val(new_reach_val);
+				neighbour.set_heuristic_val(heuristic(&neighbour, end_n));
 				neighbour.set_prev_node(node);
 			}
 		};
@@ -210,7 +212,7 @@ float euclid_heuristic(Node* node1, Node* node2) {
 float manhattan_heuristic(Node* node1, Node* node2) {
 	Point* a = node1->get_point();
 	Point* b = node2->get_point();
-	return fabs(a->get_x() - b->get_x()) + fabs(a->get_y() + b->get_y());
+	return fabs(a->get_x() - b->get_x()) + fabs(a->get_y() - b->get_y());
 }
 
 /*if (num == 1) run_through_neighbours(min_rv_node);
