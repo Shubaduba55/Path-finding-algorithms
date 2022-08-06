@@ -12,10 +12,13 @@ int factorial_sum(int num){
 
 int main() {
 	Graph graph;
-	graph.create_graph(100);
+	//graph.create_graph(10);
 	
 	//graph.print();
-	graph.find_path(0, 8556);
+	graph.read("Save1.txt");
+	graph.find_path(0, 99);
+	graph.visualize();
+	
 	return 0; 
 }
 

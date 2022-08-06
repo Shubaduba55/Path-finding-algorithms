@@ -17,14 +17,18 @@ private:
 	Point m_coordinate; 
 	int connections;
 
+	bool is_walkable;
+
 	bool is_visited;
 	float reach_value;
 	float heuristic_value;
 	Node* previous;
 
+	bool is_path = false;
+
 public:
 	Node();
-	Node(float, float);
+	Node(float, float, bool = true);
 
 	void add_connection();
 
@@ -32,8 +36,11 @@ public:
 	Point* get_point();
 	int get_num_of_neighbours();
 
-	bool get_status();
-	void status_visited();
+	bool is_node_walkable();
+	void change_walkable_status();
+
+	bool is_node_visited();
+	void set_status_visited();
 
 	float get_reach_val();
 	void set_reach_val(float);
@@ -43,6 +50,9 @@ public:
 
 	Node* get_prev_node();
 	void set_prev_node(Node*);
+
+	bool is_node_path();
+	void set_status_path();
 
 	friend ostream& operator << (ostream&, const Node&);
 };

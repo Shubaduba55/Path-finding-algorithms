@@ -4,11 +4,19 @@
 #include <vector>
 #include <functional>
 #include <chrono>
+#include <fstream>
+#include <string>
+
+
 using std::vector;
 using std::cout;
 using std::function;
+using std::ofstream;
+using std::ifstream;
+using std::string;
+using std::to_string;
+using std::ios;
 using namespace std::chrono;
-
 
 
 /*
@@ -30,17 +38,19 @@ public:
 	~Graph() {};
 
 
-	void add_node(float, float);
-	void add_edge(int, int, int);
+	void add_node(float, float, bool = true);
+	void add_edge(int, int, float);
 	void delete_node(int);
 	void print();
 	Node& get_node(int);
 
 	void find_path(int, int);
 	void create_graph(int);
+	void visualize();
+	void save(string);
+	void read(string);
 };
 
 float euclid_heuristic(Node*, Node*);
-
 
 float manhattan_heuristic(Node*, Node*);

@@ -2,20 +2,20 @@
 
 
 Edge::Edge() : m_node1(-1), m_node2(-1), m_weight(0) {}
-Edge::Edge(int node1, int node2, int wght) : 
+Edge::Edge(int node1, int node2, float wght) : 
     m_node1(node1), 
     m_node2(node2), 
     m_weight(wght) {}
 
 
-int Edge::get_weight(){return m_weight;}
+float Edge::get_weight(){return m_weight;}
 
 void Edge::extract_nodes(int& node1, int& node2){
     node1 = m_node1;
     node2 = m_node2;
     return;
 }
-void Edge::set_weight(int wght){ m_weight = wght;}
+void Edge::set_weight(float wght){ m_weight = wght;}
 
 void Edge::set_nodes(int node1, int node2) {
     m_node1 = node1;

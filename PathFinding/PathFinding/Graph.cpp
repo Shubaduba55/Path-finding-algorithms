@@ -2,17 +2,17 @@
 
 Graph::Graph(vector<Node> nodes, vector<Edge> edges): m_nodes(nodes), m_edges(edges){}
 
-void Graph::add_node(float x, float y)
+void Graph::add_node(float x, float y, bool is_walkable)
 {	
 	for (Node& elem : m_nodes) {
 		if (*elem.get_point() == Point(x, y)) return;
 	}
-	Node tmp(x, y);
+	Node tmp(x, y, is_walkable);
 	m_nodes.push_back(tmp);
 	return;
 }
 
-void Graph::add_edge(int id1, int id2, int weight)
+void Graph::add_edge(int id1, int id2, float weight)
 {
 	int extr_id1, extr_id2;
 	for (Edge& edge : m_edges) {
@@ -70,7 +70,8 @@ Node* Graph::find_min_node()
 	float value = INF;
 	Node* tmp = nullptr;
 	for (Node& elem : m_nodes) {
-		if (!elem.get_status() && value > ( elem.get_reach_val() + elem.get_heuristic_val() ) ) {
+		if (!elem.is_node_visited() && elem.is_node_walkable() && value > (elem.get_reach_val() + elem.get_heuristic_val())) 
+		{
 			tmp = &elem;
 			value = elem.get_reach_val() + elem.get_heuristic_val();
 		}
@@ -104,15 +105,17 @@ void Graph::run_through_neighbours(Node* node, Node* end_n, function<float(Node*
 		}*/
 		if (m_edges[i].get_pair_weight(current_node_id, neighbour_id, edge_wght)) {
 			neighbours_to_visit--;
+			if (m_nodes[neighbour_id].is_node_walkable()) {
 
-			Node& neighbour = this->get_node(neighbour_id);
-			float new_reach_val = node->get_reach_val() + edge_wght;
-			//float new_heuristic_val = heuristic(&neighbour, end_n);
+				Node& neighbour = this->get_node(neighbour_id);
+				float new_reach_val = node->get_reach_val() + edge_wght;
+				//float new_heuristic_val = heuristic(&neighbour, end_n);
 
-			if (neighbour.get_reach_val() > new_reach_val) {
-				neighbour.set_reach_val(new_reach_val);
-				neighbour.set_heuristic_val(heuristic(&neighbour, end_n));
-				neighbour.set_prev_node(node);
+				if (neighbour.get_reach_val() > new_reach_val) {
+					neighbour.set_reach_val(new_reach_val);
+					neighbour.set_heuristic_val(heuristic(&neighbour, end_n));
+					neighbour.set_prev_node(node); 
+				}
 			}
 		};
 	}
@@ -126,16 +129,11 @@ void Graph::find_path(int start, int end)
 	std::cin >> num;
 
 	function<float(Node*, Node*)> heuristic;
-	switch (num) {
-	case 1:
-		heuristic = [](Node*, Node*)->float { return 0; };
-		break;
-	case 2:
-		heuristic = euclid_heuristic;
-		break;
-	case 3:
-		heuristic = manhattan_heuristic;
-		break;
+	switch (num)
+	{
+	case 1:	heuristic = [](Node*, Node*)->float { return 0; }; break;
+	case 2:	heuristic = euclid_heuristic; break;
+	case 3:	heuristic = manhattan_heuristic; break;
 	}
 
 
@@ -144,6 +142,7 @@ void Graph::find_path(int start, int end)
 	//Get adresses of start and end node
 	Node& start_n = this->get_node(start);
 	Node& end_n = this->get_node(end);
+	if (!(start_n.is_node_walkable()) || !(end_n.is_node_walkable())) {cout << "\n\nError: start and end nodes are not walkable"; return;}
 
 	//Set reach value of the starting node from INF to 0
 	start_n.set_reach_val(0);
@@ -152,12 +151,11 @@ void Graph::find_path(int start, int end)
 
 	//Run loop until end node is visited
 	int count_of_visited_nodes = 0;
-	while (!end_n.get_status()) {
+	while (!end_n.is_node_visited()) {
 		count_of_visited_nodes++;
 		min_rv_node = this->find_min_node(); // find unvisited node with the least reach value
 		run_through_neighbours(min_rv_node, &end_n, heuristic); // go through this node's neighbour nodes
-		min_rv_node->status_visited(); //change status of this node from unvisited to visited
-		//visited.push_back(*min_rv_node);
+		min_rv_node->set_status_visited(); //change status of this node from unvisited to visited
 	}
 
 	auto stop = high_resolution_clock::now();
@@ -167,25 +165,24 @@ void Graph::find_path(int start, int end)
 	//Print all nodes from end to start
 	Node* tmp = &end_n;
 	while (tmp != nullptr) {
+		tmp->set_status_path();
 		cout << *tmp << std::endl;
 		tmp = tmp->get_prev_node();
 	}
 	cout << "\nNumber of visited nodes: " << count_of_visited_nodes << "\t Time:" << duration.count() << " ms" << std::endl;
 
-	/*for (Node& elem : visited) {
-		cout << elem << std::endl;
-	}*/
 	return;
 }
 
 void Graph::create_graph(int size)
 {
-	
+	srand(time(NULL));
 	for (int i = 0; i < size; i++)
 	{
 		for (int j = 0; j < size; j++)
 		{
-			this->add_node(i, j);
+			bool is_walkable = rand() % 3;
+			this->add_node(j, i, is_walkable);
 		}
 	}
 	int size_square = size * size;
@@ -203,6 +200,56 @@ void Graph::create_graph(int size)
 	}
 }
 
+void Graph::visualize()
+{
+	int size = m_nodes.size();
+	int sqr = sqrt(m_nodes.size());
+	string field = "", row = "", sign;
+
+	for (int i = 0; i < size; i++)
+	{	
+		if (m_nodes[i].is_node_path()) sign = '*';
+		else if (m_nodes[i].is_node_visited()) sign = '$';
+		else {
+			if (m_nodes[i].is_node_walkable()) sign = ' ';
+			else sign = '#';
+		};
+
+		row = row + sign + ' ';
+		if ((i + 1) % sqr == 0) { 
+			field = row + '\n' + field;
+			row = ""; 
+		}
+		
+	}
+
+	ofstream visualize("Visualize.txt", ios::trunc);
+
+	visualize << field;
+	visualize.close();
+	return;
+}
+
+void Graph::save(string path)
+{
+	ofstream save_graph(path, ios::binary);
+
+	save_graph.write((char*) this, sizeof(Graph));
+	save_graph.close();
+	return;
+}
+
+void Graph::read(string path)
+{
+	ifstream save_graph(path, ios::binary);
+
+	save_graph.read((char*)this, sizeof(Graph));
+	save_graph.close();
+	return;
+}
+
+
+
 float euclid_heuristic(Node* node1, Node* node2) {
 	Point* a = node1->get_point();
 	Point* b = node2->get_point();
@@ -215,6 +262,3 @@ float manhattan_heuristic(Node* node1, Node* node2) {
 	return fabs(a->get_x() - b->get_x()) + fabs(a->get_y() - b->get_y());
 }
 
-/*if (num == 1) run_through_neighbours(min_rv_node);
-		else if (num == 2) run_through_neighbours(min_rv_node, &end_n, euclid_heuristic);
-		else if (num == 3) run_through_neighbours(min_rv_node, &end_n, manhattan_heuristic);*/
