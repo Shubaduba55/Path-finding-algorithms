@@ -230,21 +230,39 @@ void Graph::visualize()
 	return;
 }
 
-void Graph::save(string path)
+void Graph::write(ostream& save_graph)
 {
-	ofstream save_graph(path, ios::binary);
 
-	save_graph.write((char*) this, sizeof(Graph));
-	save_graph.close();
+	//Error: empty m_nodes
+	size_t size_n = m_nodes.size();
+	save_graph.write((char*)&size_n, sizeof(size_n));
+	save_graph.write((char*)&m_nodes[0], size_n * sizeof(Node));
+	
+	//Error: empty m_edges
+	size_t size_e = m_edges.size();
+	save_graph.write((char*)&size_e, sizeof(size_e));
+	save_graph.write((char*)&m_edges[0], size_e * sizeof(Edge));
+	
+	
 	return;
 }
 
-void Graph::read(string path)
+void Graph::read(istream& read_graph)
 {
-	ifstream save_graph(path, ios::binary);
+	size_t size_n;
+	read_graph.read((char*)&size_n, sizeof(size_n));
 
-	save_graph.read((char*)this, sizeof(Graph));
-	save_graph.close();
+	vector<Node> nodes(size_n);
+	read_graph.read((char*)&nodes[0], size_n * sizeof(Node));
+	m_nodes = nodes;
+	
+	size_t size_e;
+	read_graph.read((char*)&size_e, sizeof(size_e));
+
+	vector<Edge> edges(size_e);
+	read_graph.read((char*)&edges[0], size_e * sizeof(Edge));
+	m_edges = edges;
+
 	return;
 }
 

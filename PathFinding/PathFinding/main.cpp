@@ -1,26 +1,22 @@
 #include "Graph.h"
+#include "BinaryFile.h"
 int Node::counter = 0;
 
-int factorial_sum(int num){
-	int sum = 0;
-	for (int i = 1; i < num; i++)
-	{
-		sum += i;
-	}
-	return sum;
-}
+
 
 int main() {
 	Graph graph;
-	//graph.create_graph(10);
+	//graph.create_graph(4);
+	BinaryFile file("FindingErrors.txt");
+	//file.write_graph(graph);
+	graph = file.read_graph();
 	
-	//graph.print();
-	graph.read("Save1.txt");
-	graph.find_path(0, 99);
+	//graph.find_path(0, 15);
 	graph.visualize();
 	
 	return 0; 
 }
+
 
 
 

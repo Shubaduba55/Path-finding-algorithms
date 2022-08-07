@@ -13,9 +13,12 @@ using std::cout;
 using std::function;
 using std::ofstream;
 using std::ifstream;
+using std::ios;
+using std::ostream;
+using std::istream;
 using std::string;
 using std::to_string;
-using std::ios;
+
 using namespace std::chrono;
 
 
@@ -47,8 +50,9 @@ public:
 	void find_path(int, int);
 	void create_graph(int);
 	void visualize();
-	void save(string);
-	void read(string);
+
+	void write(ostream&);
+	void read(istream&);
 };
 
 float euclid_heuristic(Node*, Node*);
