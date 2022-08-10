@@ -1,10 +1,11 @@
 #include "BinaryFile.h"
 
-void BinaryFile::write_graph(Graph& graph)
+void BinaryFile::write_graph(Graph graph)
 {
     file.open(name, ios::binary | ios::out);
     //Error: file is not found
 
+    graph.reset_graph();
     graph.write(file);
     file.close();
 }

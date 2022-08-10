@@ -17,6 +17,6 @@ private:
 public:
     BinaryFile(string name) : name(name) {};
     
-    void write_graph(Graph&);
+    void write_graph(Graph);
     Graph read_graph();
 };

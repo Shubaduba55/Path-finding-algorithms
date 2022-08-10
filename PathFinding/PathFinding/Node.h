@@ -31,6 +31,7 @@ public:
 	Node(float, float, bool = true);
 
 	void add_connection();
+	void delete_connection();
 
 	int get_id();
 	Point* get_point();
@@ -54,5 +55,6 @@ public:
 	bool is_node_path();
 	void set_status_path();
 
+	void reset();
 	friend ostream& operator << (ostream&, const Node&);
 };

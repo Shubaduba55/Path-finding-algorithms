@@ -14,6 +14,8 @@ int Node::get_id(){	return m_id; }
  
 void Node::add_connection(){ connections++; }
 
+void Node::delete_connection(){ connections--; }
+
 Point* Node::get_point(){ return &m_coordinate; }
 
 int Node::get_num_of_neighbours(){ return connections; }
@@ -41,6 +43,16 @@ void Node::set_prev_node(Node* node){ previous = node;}
 bool Node::is_node_path(){ return is_path; }
 
 void Node::set_status_path(){ is_path = true; }
+
+void Node::reset()
+{
+	is_visited = false;
+	reach_value = INF;
+	heuristic_value = 0;
+	previous = nullptr;
+	is_path = false;
+	return;
+}
 
 ostream& operator<<(ostream& out, const Node& node)
 {

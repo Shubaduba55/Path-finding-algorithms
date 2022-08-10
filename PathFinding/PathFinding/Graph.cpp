@@ -1,6 +1,8 @@
 #include "Graph.h"
 
-Graph::Graph(vector<Node> nodes, vector<Edge> edges): m_nodes(nodes), m_edges(edges){}
+Graph::Graph() : is_resetted(true) {}
+
+Graph::Graph(vector<Node> nodes, vector<Edge> edges): m_nodes(nodes), m_edges(edges), is_resetted(true){}
 
 void Graph::add_node(float x, float y, bool is_walkable)
 {	
@@ -29,18 +31,46 @@ void Graph::add_edge(int id1, int id2, float weight)
 
 void Graph::delete_node(int id)
 {
-	if (id > m_nodes.size()) {
+	//Error: node doesn't exist
+	
+	vector<Node> new_nodes;
+	int tmp_id; float wght;
+	bool node_belongs = false;
+	vector<int> neighbours_id;
 
-		return;
-	}
-	else {
-		vector<Node> new_nodes;
-		for (int i = 0; i < m_nodes.size(); i++)
-		{	
-			if(m_nodes[i].get_id()!=id)	new_nodes.push_back(m_nodes[i]);
+	Node& node_to_delete = get_node(id);
+	int connections = node_to_delete.get_num_of_neighbours();
+	
+
+	for (int i = 0; connections; i++) {
+		if (m_edges[i].get_pair_weight(id, tmp_id, wght)) {
+			neighbours_id.push_back(tmp_id);
+			connections--;
 		}
-		m_nodes = new_nodes;
 	}
+	for (int neighbour_id : neighbours_id) delete_edge(id, neighbour_id);
+	for (Node& node : m_nodes) {if (node.get_id() != id) new_nodes.push_back(node);}
+	m_nodes = new_nodes;
+	return;
+}
+
+void Graph::delete_edge(int id1, int id2)
+{
+	vector<Edge> new_edges;
+	int tmp_id1, tmp_id2;
+	bool edge_belongs = false;
+	for (Edge& edge : m_edges) {
+		edge.extract_nodes(tmp_id1, tmp_id2);
+		if ((id1 != tmp_id1 || id2 != tmp_id2) && (id1 != tmp_id2 || id2 != tmp_id1)) new_edges.push_back(edge);
+		else { 
+			edge_belongs = true; 
+			get_node(id1).delete_connection();
+			get_node(id2).delete_connection();
+		}
+	}
+	m_edges = new_edges;
+	//Error: edge doesn't belong
+	return;
 }
 
 void Graph::print()
@@ -64,6 +94,7 @@ Node& Graph::get_node(int id)
 		if (m_nodes[i].get_id() == id) return m_nodes[i];
 	}
 }
+
 
 Node* Graph::find_min_node()
 {
@@ -105,9 +136,8 @@ void Graph::run_through_neighbours(Node* node, Node* end_n, function<float(Node*
 		}*/
 		if (m_edges[i].get_pair_weight(current_node_id, neighbour_id, edge_wght)) {
 			neighbours_to_visit--;
-			if (m_nodes[neighbour_id].is_node_walkable()) {
-
-				Node& neighbour = this->get_node(neighbour_id);
+			Node& neighbour = this->get_node(neighbour_id);
+			if (neighbour.is_node_walkable()) {
 				float new_reach_val = node->get_reach_val() + edge_wght;
 				//float new_heuristic_val = heuristic(&neighbour, end_n);
 
@@ -124,6 +154,7 @@ void Graph::run_through_neighbours(Node* node, Node* end_n, function<float(Node*
 
 void Graph::find_path(int start, int end)
 {
+	this->reset_graph();
 	int num;
 	cout << "\n\nChoose the way to find path: \n1.Dijkstra;\n2.A*(euclidian heuristic)\n3.A*(manhattan heuristic)\n\nEnter number(1, 2 or 3): ";
 	std::cin >> num;
@@ -147,7 +178,7 @@ void Graph::find_path(int start, int end)
 	//Set reach value of the starting node from INF to 0
 	start_n.set_reach_val(0);
 	Node* min_rv_node; // Node with minimal reach value
-	vector<Node> visited;
+	
 
 	//Run loop until end node is visited
 	int count_of_visited_nodes = 0;
@@ -158,6 +189,7 @@ void Graph::find_path(int start, int end)
 		min_rv_node->set_status_visited(); //change status of this node from unvisited to visited
 	}
 
+	is_resetted = false;
 	auto stop = high_resolution_clock::now();
 	auto duration = duration_cast<milliseconds>(stop - strt);
 
@@ -169,8 +201,20 @@ void Graph::find_path(int start, int end)
 		cout << *tmp << std::endl;
 		tmp = tmp->get_prev_node();
 	}
-	cout << "\nNumber of visited nodes: " << count_of_visited_nodes << "\t Time:" << duration.count() << " ms" << std::endl;
+	cout << "\nNumber of visited nodes: " << count_of_visited_nodes << "\t Time:" << duration.count() << " ms" << 
+		"\t Path value: "<< end_n.get_reach_val() << std::endl;
 
+	return;
+}
+
+void Graph::reset_graph()
+{
+	if (is_resetted) return;
+	else { 
+		for (Node& node : m_nodes) node.reset(); 
+		is_resetted = true;
+	}
+	
 	return;
 }
 
@@ -211,7 +255,7 @@ void Graph::visualize()
 		if (m_nodes[i].is_node_path()) sign = '*';
 		else if (m_nodes[i].is_node_visited()) sign = '$';
 		else {
-			if (m_nodes[i].is_node_walkable()) sign = ' ';
+			if (m_nodes[i].is_node_walkable()) sign = '+';
 			else sign = '#';
 		};
 
