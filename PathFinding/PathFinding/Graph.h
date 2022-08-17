@@ -32,27 +32,36 @@ private:
 	vector<Node> m_nodes;
 	vector<Edge> m_edges;
 	bool is_resetted;
+	
+	int rows, clms;
 
 	Node* find_min_node();
-	//void run_through_neighbours(Node*, Node* = nullptr, function<float(Node*, Node*)> = [](Node* = nullptr, Node* = nullptr)->float {return 0; });
 	void run_through_neighbours(Node*, Node*, function<float(Node*, Node*)>);
 public:
 	Graph();
 	Graph(vector<Node>, vector<Edge>);
 	~Graph() {};
 
+	int get_rows();
+	int get_columns();
+
+
+	bool does_node_exist(float, float);
+	bool does_node_exist(int);
+	bool does_edge_exist(int, int);
 
 	void add_node(float, float, bool = true);
 	void add_edge(int, int, float);
 	void delete_node(int);
 	void delete_edge(int, int);
+	void delete_graph();
 
 	void print();
 	Node& get_node(int);
 
-	void find_path(int, int);
+	void find_path(int, int, int);
 	void reset_graph();
-	void create_graph(int);
+	void create_graph(int, int, int = 0);
 	void visualize();
 
 	void write(ostream&);

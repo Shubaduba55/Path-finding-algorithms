@@ -14,7 +14,10 @@ int Node::get_id(){	return m_id; }
  
 void Node::add_connection(){ connections++; }
 
-void Node::delete_connection(){ connections--; }
+void Node::delete_connection(){
+	if (connections == 0) throw "number of connections is already zero";
+	connections--;
+} //Error: connections < 0
 
 Point* Node::get_point(){ return &m_coordinate; }
 
@@ -53,6 +56,8 @@ void Node::reset()
 	is_path = false;
 	return;
 }
+
+void Node::reset_counter() {counter = 0;}
 
 ostream& operator<<(ostream& out, const Node& node)
 {

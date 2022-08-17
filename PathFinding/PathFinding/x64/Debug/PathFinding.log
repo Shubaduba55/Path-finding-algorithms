@@ -1,2 +1,5 @@
-﻿  main.cpp
+﻿  cMain.cpp
+C:\Path-finding-algorithms\PathFinding\PathFinding\cMain.cpp(104,46): warning C4129: 'P': unrecognized character escape sequence
+C:\Path-finding-algorithms\PathFinding\PathFinding\cMain.cpp(104,46): warning C4129: 'S': unrecognized character escape sequence
+C:\Path-finding-algorithms\PathFinding\PathFinding\cMain.cpp(126,22): warning C4101: 'text': unreferenced local variable
   PathFinding.vcxproj -> C:\Path-finding-algorithms\PathFinding\x64\Debug\PathFinding.exe

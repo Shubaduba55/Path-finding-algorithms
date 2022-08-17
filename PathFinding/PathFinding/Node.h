@@ -1,14 +1,11 @@
 #pragma once
 #include "Point.h"
-#include <vector>
+#include <exception>
 #define INF 1000000000
 
-using std::vector;
+
 using std::ostream;
-/*
-	Розрахунок координат на основі зв'язку
-	Додавання зв'язку
-*/
+
 class Node {
 private:
 	int static counter;
@@ -56,5 +53,6 @@ public:
 	void set_status_path();
 
 	void reset();
+	static void reset_counter();
 	friend ostream& operator << (ostream&, const Node&);
 };

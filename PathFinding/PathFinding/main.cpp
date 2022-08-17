@@ -1,25 +1,36 @@
+/*
+
 #include "Graph.h"
 #include "BinaryFile.h"
 #include <iterator>
 int Node::counter = 0;
 using std::iterator;
 
+void smt() { return; }
+
+int smth(int a){
+	if (a < 0) throw "smth went wrong";
+	a = a * -1;
+	return a;
+}
 
 int main() {
 	Graph graph;
-	BinaryFile file("2500.txt");
+	BinaryFile file("FindingErrors.txt");
 
-
-	graph = file.read_graph();
-	//graph.delete_node(8);
 	
-	//graph.delete_node(2449);
-	graph.find_path(0, 2499);
+	//graph = file.read_graph();
 
+	graph.create_graph(30);
+	graph.find_path(0, 899);
+	
 	graph.visualize();
+
+	
 	return 0; 
 }
 
+*/
 
 
 

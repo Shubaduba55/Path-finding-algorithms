@@ -5,8 +5,17 @@ Point::Point(float x, float y) : m_x(x), m_y(y) {}
 
 float Point::get_x() { return m_x; }
 float Point::get_y() { return m_y; }
-void Point::set_x(float x) { m_x = x; return; }
-void Point::set_y(float y) { m_y = y; return; }
+void Point::set_x(float x) { 
+	if (x < 0 || x > 100) throw "x is out of range [0;100]";
+	m_x = x; 
+	return; 
+}//Error: out of range (0, 100)
+
+void Point::set_y(float y) { 
+	if (y < 0 || y > 100) throw "y is out of range [0;100]";
+	m_y = y; 
+	return;
+}//Error: out of range (0, 100)
 
 bool Point::operator==(const Point& other)
 {	
