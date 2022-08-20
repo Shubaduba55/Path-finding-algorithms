@@ -149,10 +149,8 @@
   <ItemGroup>
     <ClCompile Include="BinaryFile.cpp" />
     <ClCompile Include="cApp.cpp" />
-    <ClCompile Include="cField.cpp" />
     <ClCompile Include="Edge.cpp" />
     <ClCompile Include="Graph.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="cMain.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Point.cpp" />
@@ -160,12 +158,14 @@
   <ItemGroup>
     <ClInclude Include="BinaryFile.h" />
     <ClInclude Include="cApp.h" />
-    <ClInclude Include="cField.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="cMain.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Point.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

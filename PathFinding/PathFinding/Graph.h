@@ -4,8 +4,10 @@
 #include <vector>
 #include <functional>
 #include <chrono>
+#include <thread>
 #include <fstream>
 #include <string>
+
 
 
 using std::vector;
@@ -54,12 +56,12 @@ public:
 	void add_edge(int, int, float);
 	void delete_node(int);
 	void delete_edge(int, int);
-	void delete_graph();
+	void delete_graph_info();
 
 	void print();
 	Node& get_node(int);
 
-	void find_path(int, int, int);
+	string find_path(int, int, int);
 	void reset_graph();
 	void create_graph(int, int, int = 0);
 	void visualize();

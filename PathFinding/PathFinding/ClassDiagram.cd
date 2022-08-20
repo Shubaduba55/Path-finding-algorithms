@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BinaryFile">
+    <Position X="0.75" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAIAAAAAAAAAAAAAAAAEAAAABAAAAQAAAAA=</HashCode>
+      <FileName>BinaryFile.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cApp">
+    <Position X="4.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AARAAAAAAAAAAAACAAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>cApp.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cMain" Collapsed="true">
+    <Position X="5.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AkCQAAIACAAMBAAJAADAAAiCGIAAAABAUAAAgQAAQAA=</HashCode>
+      <FileName>cMain.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Edge">
+    <Position X="4.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAACAAAAAAAABAAAAAAAAAAAQBAAACBgAABAAAAA=</HashCode>
+      <FileName>Edge.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Graph">
+    <Position X="6.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAYCAAAAoAAAEAhAAKBABABAAIAAAAhAAQAAgACRAQA=</HashCode>
+      <FileName>Graph.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Node">
+    <Position X="2.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAACCAAxBAAYAAAFAAEAAEFUCIQBAAKEAQAg=</HashCode>
+      <FileName>Node.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Point">
+    <Position X="0.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAgAAAAgAAAQAAQABAAAAAAAAAAAAAIAA=</HashCode>
+      <FileName>Point.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="wxApp">
+    <Position X="8.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAEAAAAAA=</HashCode>
+      <FileName>C:\sdks\wx320\include\wx\msw\app.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="wxFrame" Collapsed="true">
+    <Position X="8.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAEAAAAAAAAAAAAAEACAAEAAAAAAAACAAAA=</HashCode>
+      <FileName>C:\sdks\wx320\include\wx\univ\frame.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

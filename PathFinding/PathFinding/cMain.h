@@ -1,6 +1,5 @@
 #pragma once
 #include <wx\wx.h>
-#include <wx/wfstream.h> //for wxFileInputStream
 #include "BinaryFile.h"
 #include "Graph.h"
 
@@ -9,7 +8,7 @@
 class cMain: public wxFrame
 {
 private:
-	//m_txt1 = new wxTextCtrl(this, wxID_ANY, "", wxPoint(10, 70), wxSize(300, 30));
+	
 	wxTextCtrl* rows;//10001
 	wxTextCtrl* clms;//10002
 	wxTextCtrl* obst;//10003
@@ -39,13 +38,13 @@ private:
 	void OnButtonField(wxCommandEvent&);
 
 	wxDECLARE_EVENT_TABLE();
-public:
-	cMain();
-	~cMain();
 
 	void delete_field();
 	void create_field(int, int);
 	void to_colour_field();
 	void set_cell_colour(int, wxColor&);
+public:
+	cMain();
+	~cMain();
 };
 

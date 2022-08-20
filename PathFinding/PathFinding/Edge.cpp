@@ -26,8 +26,8 @@ void Edge::set_nodes(int node1, int node2) {
 bool Edge::get_pair_weight(int node_id1, int& node_id2, float& wght)
 {
     /*
-    Function that checks, if the given node_id1 belongs to our edge. If so, returns true, id of the second node and it's weight.
-    In other case return false.
+    Function that checks, if the given node_id1 belongs to our edge. If so, returns true, id of the second node and its weight.
+    In other case returns false.
     */
     if (m_node1 == node_id1) {
         node_id2 = m_node2;

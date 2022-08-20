@@ -1,5 +1,5 @@
 #include "cMain.h"
-//#include <wx/listctrl.h>
+
 
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
 EVT_BUTTON(1, cMain::OnButtonField)
@@ -23,7 +23,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Path Finding", wxPoint(300, 150), w
 	clms = new wxTextCtrl(panel, 10002, "", wxPoint(115, 30), wxSize(20, 20));
 
 	wxStaticText* t_obst = new wxStaticText(panel, wxID_ANY, "obstacles: ", wxPoint(145, 30));
-	obst = new wxTextCtrl(panel, 10003, "0", wxPoint(205, 30), wxSize(20, 20));
+	obst = new wxTextCtrl(panel, 10003, "0", wxPoint(200, 30), wxSize(35, 20));
 
 
 	btn_create_graph = new wxButton(panel, 11001, "Create Graph", wxPoint(15, 60), wxSize(210, 50));
@@ -36,11 +36,11 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Path Finding", wxPoint(300, 150), w
 	
 
 	wxStaticText* t_start_n = new wxStaticText(panel, wxID_ANY, "start node:", wxPoint(400, 65));
-	start_n = new wxTextCtrl(panel, 10004, "", wxPoint(465, 60), wxSize(25, 20));
+	start_n = new wxTextCtrl(panel, 10004, "", wxPoint(460, 60), wxSize(35, 20));
 
 
 	wxStaticText* t_end_n = new wxStaticText(panel, wxID_ANY, "end node:", wxPoint(500, 65));
-	end_n = new wxTextCtrl(panel, 10005, "", wxPoint(565, 60), wxSize(25, 20));
+	end_n = new wxTextCtrl(panel, 10005, "", wxPoint(560, 60), wxSize(35, 20));
 
 	btn_find_path = new wxButton(panel, 11004, "Find Path", wxPoint(400, 85), wxSize(200, 50));
 
@@ -52,143 +52,170 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Path Finding", wxPoint(300, 150), w
 
 void cMain::OnClickCreateGraph(wxCommandEvent& evt)
 {
-	int int_rows = wxAtoi(rows->GetValue());
-	int int_columns = wxAtoi(clms->GetValue());
-	int int_obstacles = wxAtoi(obst->GetValue());
-	if (int_rows < 2 || int_columns < 2) throw "The number of rows and columns must be more than 2";
+	wxString str_rows = rows->GetValue(), 
+		str_columns = clms->GetValue(), 
+		str_obstacles = obst->GetValue();
 
-	//if (&graph != nullptr) delete &graph;
-	//graph.create_graph(int_rows, int_columns, int_obstacles);
-	//graph.visualize();
+	if (str_rows.IsEmpty() || str_columns.IsEmpty() || str_obstacles.IsEmpty()) {
+		wxMessageBox(_("Error: Not enough info given"), _(""), wxICON_ERROR | wxOK, this);
+		return;
+	}
 
-	wxString text;
-	//text << int_rows << int_columns << int_obstacles;
-	//wxFrame* tmp = new wxFrame(nullptr, wxID_ANY, text, wxPoint(300, 150), wxSize(800, 600));
-	//tmp->Show(true);
+	if (!(str_rows.IsNumber() && str_columns.IsNumber() && str_obstacles.IsNumber())) {
+		wxMessageBox(_("Error: Given info is not numbers"), _(""), wxICON_ERROR | wxOK, this);
+		return;
+	}
+
+
+	int int_rows = wxAtoi(str_rows);
+	int int_columns = wxAtoi(str_columns);
+	int int_obstacles = wxAtoi(str_obstacles);
+	
 
 	if (btn != nullptr && field != nullptr) delete_field();
-	graph.create_graph(int_rows, int_columns, int_obstacles);
-	create_field(int_rows, int_columns);
+
+	try { graph.create_graph(int_rows, int_columns, int_obstacles);}
+	catch(const char* text){
+		wxMessageBox(_(text), _(""), wxICON_ERROR | wxOK, this);
+		return;
+	}
+
+	try { create_field(int_rows, int_columns); }
+	catch (const char* text) {
+		wxMessageBox(_(text), _(""), wxICON_ERROR | wxOK, this);
+		return;
+	}
+
+	
 	graph.visualize();
 	evt.Skip();
 }
 
 void cMain::OnClickFindPath(wxCommandEvent& evt)
 {
-	int start_node = wxAtoi(start_n->GetValue());
-	int end_node = wxAtoi(end_n->GetValue());
-	int size = graph.get_rows() * graph.get_columns();
+	if (wxWindow::FindWindowByName("Field") == nullptr) {
+		wxMessageBox(_("Error: Field doesn't exist"), _(""), wxICON_ERROR | wxOK, this);
+		return;
+	}
+
+
+	wxString str_start = start_n->GetValue(),
+		str_end = end_n->GetValue();
+
+	if (str_start.IsEmpty() || str_end.IsEmpty()) {
+		wxMessageBox(_("Error: Not enough info given"), _(""), wxICON_ERROR | wxOK, this);
+		return;
+	}
+
+	if (!(str_start.IsNumber() && str_end.IsNumber())) {
+		wxMessageBox(_("Error: Given info is not numbers"), _(""), wxICON_ERROR | wxOK, this);
+		return;
+	}
+
 	int algorithm_option = choice_algorithm->GetSelection() + 1;
+	if (algorithm_option == 0){
+		wxMessageBox(_("Error: The algorithm has not been chosen"), _(""), wxICON_ERROR | wxOK, this);
+		return;
+	}
+	
+	int start_node = wxAtoi(str_start);
+	int end_node = wxAtoi(str_end);
+	int size = graph.get_rows() * graph.get_columns();
+	
+	if (size == 0) {
+		wxMessageBox(_("Error: Graph doesn't exist"), _(""), wxICON_ERROR | wxOK, this);
+		return;
+	}
+	
+	//std::thread th1(&cMain::to_colour_field);
+	wxString info;
+	try {
+		info = graph.find_path(start_node, end_node, algorithm_option);
+	}
+	catch (const char* text) {
+		wxMessageBox(_(text), _(""), wxICON_ERROR | wxOK, this);
+		return;
+	}
+	//th1.join();
 
-	if (0 > start_node || start_node > size || 0 > end_node || end_node > size) throw "id is out of range";
-	if (!graph.get_node(start_node).is_node_walkable() ||
-		!graph.get_node(end_node).is_node_walkable()) throw "nodes must not be obstacles";
+	try {
+		to_colour_field();
+	}
+	catch (const char* text) {
+		wxMessageBox(_(text), _(""), wxICON_ERROR | wxOK, this);
+		return;
+	}
+	
 
-	graph.find_path(start_node, end_node, algorithm_option);
-	to_colour_field();
+	wxMessageBox(_(info), _(""), wxICON_INFORMATION | wxOK, this);
 	graph.visualize();
 	evt.Skip();
 }
 
 void cMain::OnClickLoad(wxCommandEvent& WXUNUSED(event))
 {
-	if (false)
-	{
-		if (wxMessageBox(_("Current content has not been saved! Proceed?"), _("Please confirm"),
-			wxICON_QUESTION | wxYES_NO, this) == wxNO)
-			return;
-		
-	}
-
-	wxFileDialog 
-		openFileDialog(this, _("Open graph file"), "C:\Path-finding-algorithms\PathFinding\Saved/files", "",
+	//if (wxMessageBox(_("Current content has not been saved! Proceed?"), _("Please confirm"), wxICON_QUESTION | wxYES_NO, this) == wxNO)
+			
+	wxFileDialog openFileDialog(this, _("Open graph file"), "C:\Path-finding-algorithms\PathFinding\Saved/files", "",
 			"GPH files (*.gph)|*.gph", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL) return;     
 
-	
-	wxFileInputStream input_stream(openFileDialog.GetPath());
-	if (!input_stream.IsOk())
-	{
-		wxLogError("Cannot open file '%s'.", openFileDialog.GetPath());
+		
+	BinaryFile file(openFileDialog.GetPath().ToStdString());	
+		
+	if (btn != nullptr && field != nullptr) delete_field();
+
+	try {graph = file.read_graph();}
+	catch (const char* text) {
+		wxMessageBox(_(text), _(""), wxICON_ERROR | wxOK, this);
 		return;
 	}
-	
-	else {
-		BinaryFile file(openFileDialog.GetPath().ToStdString());
-		
-		int a = 0;
-		if (btn != nullptr && field != nullptr) delete_field();
-		try {
-			graph = file.read_graph();
-		}
-		catch (const char* text) {
-			a++;
-			return;
-		}
-		create_field(graph.get_rows(), graph.get_columns());
-		graph.visualize();
 
-	}
-
+	create_field(graph.get_rows(), graph.get_columns());
 }
 
 void cMain::OnClickSave(wxCommandEvent& WXUNUSED(event))
 {
-	if (graph.get_rows() * graph.get_columns() == 0) throw "graph is empty";
-	if (wxWindow::FindWindowByName("Field") == nullptr) throw "there is no graph";
-
-	wxFileDialog
-		saveFileDialog(this, _("Save GPH file"), "", "",
-			"GPH files (*.gph)|*.gph", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-	if (saveFileDialog.ShowModal() == wxID_CANCEL)
-		return;    
-
 	
-	wxFileOutputStream output_stream(saveFileDialog.GetPath());
-	if (!output_stream.IsOk())
-	{
-		wxLogError("Cannot save current contents in file '%s'.", saveFileDialog.GetPath());
+	if (wxWindow::FindWindowByName("Field") == nullptr) {
+		wxMessageBox(_("Error: Graph doesn't exist"), _(""), wxICON_ERROR | wxOK, this);
 		return;
 	}
-	else {
-		BinaryFile file(saveFileDialog.GetPath().ToStdString());
-		file.write_graph(graph);
 
+	wxFileDialog saveFileDialog(this, _("Save GPH file"), "", "",
+			"GPH files (*.gph)|*.gph", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+	if (saveFileDialog.ShowModal() == wxID_CANCEL) return;    
+
+	BinaryFile file(saveFileDialog.GetPath().ToStdString());
+	try { file.write_graph(graph); }
+	catch (const char* text) {
+		wxMessageBox(_(text), _(""), wxICON_ERROR | wxOK, this); 
+		return;
 	}
+	
 }
 
 void cMain::OnButtonField(wxCommandEvent& evt)
 {
-	/*
-	m_list1->AppendString(m_txt1->GetValue());
-	m_txt1->Clear();
-	evt.Skip();//Event handled
-	*/
 	int cell_id = evt.GetId() - 1000;
 	int row = cell_id / graph.get_columns();
 	int col = cell_id % graph.get_columns();
 
-	if (btn[row][col]->GetBackgroundColour() != wxT("#5b5b5b")) {
+	if (btn[row][col]->GetBackgroundColour() != wxT("#5b5b5b")) 
+
 		btn[row][col]->SetBackgroundColour(wxT("#5b5b5b"));
-		//btn[row][col]->SetForegroundColour(*wxWHITE);
-	}
-	else {
+
+	else
 		btn[row][col]->SetBackgroundColour(*wxWHITE);
-		//btn[row][col]->SetForegroundColour(*wxBLACK);
-	};
+
 	graph.get_node(cell_id).change_walkable_status();
-
-
-	//btn[row][col]->SetBackgroundColour(*wxBLACK);
-	//btn[row][col]->SetForegroundColour(*wxWHITE);
-	graph.visualize();
+	//graph.visualize();
 	evt.Skip();
 	return;
 }
 
-cMain::~cMain()
-{
-}
+cMain::~cMain(){}
 
 void cMain::delete_field()
 {
@@ -215,7 +242,8 @@ void cMain::delete_field()
 
 void cMain::create_field(int nFieldHeight, int nFieldWidth)
 {
-	
+	if (nFieldHeight <= 0 || nFieldWidth <= 0) throw "Error: Field size cannot be zero or less";
+
 	field = new wxFrame(this, wxID_ANY, "Field", wxPoint(0, 0), wxSize(2000, 2000));
 	
 	btn = new wxButton** [nFieldHeight];
@@ -227,22 +255,13 @@ void cMain::create_field(int nFieldHeight, int nFieldWidth)
 		btn[x] = new wxButton * [nFieldWidth];
 		for (int y = 0; y < nFieldWidth; y++)
 		{
-
-
-			//btn[x][y] = new wxButton(this, (x * nFieldWidth + y), std::to_string((x * nFieldWidth + y)));
 			btn[x][y] = new wxButton(field, id, std::to_string(id - 1000), wxDefaultPosition, wxSize(50, 50));
-			//btn[x][y]->SetSize(wxSize(0, 0));
 
 			Node& current_cell = graph.get_node(id - 1000);
 			if(current_cell.is_node_walkable())	btn[x][y]->SetBackgroundColour(*wxWHITE);
-			else {
-				//btn[x][y]->SetBackgroundColour(*wxBLACK);
-				//btn[x][y]->SetForegroundColour(*wxWHITE);
-				btn[x][y]->SetBackgroundColour(wxT("#5b5b5b"));
-				//btn[x][y]->SetForegroundColour(*wxWHITE);
-			}
+			else btn[x][y]->SetBackgroundColour(wxT("#5b5b5b"));
+				
 			id++;
-			
 			grid->Add(btn[x][y], 1, wxEXPAND | wxALL);
 			btn[x][y]->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cMain::OnButtonField, this);
 		}
@@ -255,15 +274,21 @@ void cMain::create_field(int nFieldHeight, int nFieldWidth)
 
 void cMain::to_colour_field()
 {
+	if (wxWindow::FindWindowByName("Field") == nullptr) throw "Error: Field doesn't exist";
+
 	int size = graph.get_rows() * graph.get_columns();
+
+
+	wxColour path, visited, walkable, obstacle;
+	path.Set(wxT("#81BEF7"));
+	visited.Set(wxT("#58FAAC"));
+	walkable.Set(wxT("#ffffff"));
+	obstacle.Set(wxT("#5b5b5b"));//#9999
+
+
 	for (int i = 0; i < size; i++)
 	{
 		Node& node = graph.get_node(i);
-		wxColour path, visited, walkable, obstacle;
-		path.Set(wxT("#81BEF7"));
-		visited.Set(wxT("#58FAAC"));
-		walkable.Set(wxT("#ffffff"));
-		obstacle.Set(wxT("#5b5b5b"));//#9999
 
 		if (node.is_node_path()) set_cell_colour(i, path);
 		else if (node.is_node_visited()) set_cell_colour(i, visited);
@@ -271,81 +296,23 @@ void cMain::to_colour_field()
 			if (node.is_node_walkable()) set_cell_colour(i, walkable);
 			else set_cell_colour(i, obstacle);
 		};
-		
+		//std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
 
 }
 
 void cMain::set_cell_colour(int cell_id, wxColor& colour)
 {
+
+	//if (wxWindow::FindWindowByName("Field") == nullptr) throw "Error: Field doesn't exist";
+	//This exception takes too much time to draw field, besides it is not necessary as we check for this mistake
+	//in to_colour_field() 
+
+	if (graph.get_columns() * graph.get_rows() == 0) throw "Error: Graph doesn't exist";
+	
 	int row = cell_id / graph.get_columns();
 	int col = cell_id % graph.get_columns();
 	btn[row][col]->SetBackgroundColour(colour);
 }
 
 
-/*
-wxPanel* panel_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(200, 100));
-	panel_top->SetBackgroundColour(wxColor(100, 100, 200));
-
-	wxPanel* panel_bottom = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(200, 100));
-	panel_bottom->SetBackgroundColour(wxColor(200, 100, 100));
-
-	wxPanel* panel_bottom_right = new wxPanel(panel_bottom, wxID_ANY, wxDefaultPosition, wxSize(200, 100));
-	panel_bottom_right->SetBackgroundColour(wxColor(100, 200, 100));
-
-
-	wxBoxSizer* vsizer = new wxBoxSizer(wxVERTICAL);
-	vsizer->Add(panel_top, 1, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, 10);
-	vsizer->Add(panel_bottom, 1, wxEXPAND | wxALL, 10);
-	wxBoxSizer* hsizer = new wxBoxSizer(wxVERTICAL);
-	//hsizer->Add(panel_bottom, 1, wxEXPAND | wxRIGHT, 10);
-	hsizer->Add(panel_bottom_right, 1, wxALIGN_RIGHT | wxALL, 10);
-
-	panel_bottom->SetSizerAndFit(hsizer);
-
-	this->SetSizerAndFit(vsizer);
-
-*/
-
-/*
-
-wxListView* list = new wxListView(this, wxID_ANY, wxDefaultPosition, wxSize(300, 200));
-	list->InsertColumn(0, "Name");
-	list->InsertItem(0, "Item");
-
-	wxButton* ok_button = new wxButton(this, wxID_ANY, "Ok");
-	wxButton* cancel_button = new wxButton(this, wxID_ANY, "Cancel");
-
-	wxBoxSizer* s1 = new wxBoxSizer(wxVERTICAL);
-	s1->Add(list, 1, wxEXPAND | wxALL, 5);
-
-
-	wxBoxSizer* s2 = new wxBoxSizer(wxHORIZONTAL);
-	s2->Add(ok_button, 0, wxRIGHT, 5);
-	s2->Add(cancel_button, 0);
-
-	s1->Add(s2, 0, wxALIGN_RIGHT | wxRIGHT | wxBOTTOM, 5);
-
-	this->SetSizerAndFit(s1);
-
-*/
-
-/*
-
-wxColour col1, col2;
-	col1.Set(wxT("#4f2000"));
-	col2.Set(wxT("#ededed"));
-
-	wxPanel* panel = new wxPanel(this, -1);
-	panel->SetBackgroundColour(col1);
-	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
-
-	wxPanel* midPan = new wxPanel(panel, wxID_ANY);
-	midPan->SetBackgroundColour(col2);
-
-	vbox->Add(midPan, 2, wxEXPAND | wxALL, 30);
-	panel->SetSizer(vbox);
-
-	Centre();
-*/

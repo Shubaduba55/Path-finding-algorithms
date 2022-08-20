@@ -1,6 +1,6 @@
 #include "Graph.h"
 
-Graph::Graph() : is_resetted(true) {}
+Graph::Graph() : is_resetted(true), rows(0), clms(0) {}
 
 Graph::Graph(vector<Node> nodes, vector<Edge> edges): m_nodes(nodes), m_edges(edges), is_resetted(true){}
 
@@ -109,7 +109,7 @@ void Graph::delete_edge(int id1, int id2)
 	return;
 }
 
-void Graph::delete_graph()
+void Graph::delete_graph_info()
 {
 	m_nodes.clear(); m_edges.clear(); Node::reset_counter();
 	rows = 0;
@@ -156,7 +156,7 @@ Node* Graph::find_min_node()
 		}
 	} 
 
-	//Error: tmp == nullptr then end is not reachable
+	//if tmp == nullptr then end is not reachable
 	return tmp;
 }
 
@@ -187,13 +187,15 @@ void Graph::run_through_neighbours(Node* node, Node* end_n, function<float(Node*
 	return;
 }
 
-void Graph::find_path(int start, int end, int algorithm_option)
+string Graph::find_path(int start, int end, int algorithm_option)
 {
-	this->reset_graph();
-	//int num;
-	//cout << "\n\nChoose the way to find path: \n1.Dijkstra;\n2.A*(euclidian heuristic)\n3.A*(manhattan heuristic)\n\nEnter number(1, 2 or 3): ";
-	//std::cin >> num;
+	if (0 > start || start >= m_nodes.size() || 0 > end || end >= m_nodes.size()) throw "Error: Node's id is out of range";
+	
+	if (!get_node(start).is_node_walkable() ||
+		!get_node(end).is_node_walkable()) throw "Error: Node must not be an obstacle";
 
+	this->reset_graph();
+	
 	function<float(Node*, Node*)> heuristic;
 	switch (algorithm_option)
 	{
@@ -208,9 +210,6 @@ void Graph::find_path(int start, int end, int algorithm_option)
 	//Get adresses of start and end node
 	Node& start_n = this->get_node(start);
 	Node& end_n = this->get_node(end);
-
-	//Error: chosen nodes are not walkable
-	if (!(start_n.is_node_walkable()) || !(end_n.is_node_walkable())) {cout << "\n\nError: start and end nodes are not walkable"; return;}
 
 	//Set reach value of the starting node from INF to 0
 	start_n.set_reach_val(0);
@@ -227,28 +226,34 @@ void Graph::find_path(int start, int end, int algorithm_option)
 			count_of_visited_nodes++;
 			run_through_neighbours(min_rv_node, &end_n, heuristic); // go through this node's neighbour nodes
 			min_rv_node->set_status_visited(); //change status of this node from unvisited to visited
+			//visualize(); std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 		else {
-			is_en_reachable = false; cout << "End node is not reachable\n";
+			is_en_reachable = false;
 		}
 	}
 
 	is_resetted = false;
 	auto stop = high_resolution_clock::now();
 	auto duration = duration_cast<milliseconds>(stop - strt);
-	//Error: there is no path between start and end
+	
 
-	//Print all nodes from end to start
+	//Go through shortest path from end to start
 	Node* tmp = &end_n;
 	while (tmp != nullptr && is_en_reachable) {
 		tmp->set_status_path();
-		cout << *tmp << std::endl;
 		tmp = tmp->get_prev_node();
 	}
-	cout << "\nNumber of visited nodes: " << count_of_visited_nodes << "\t Time:" << duration.count() << " ms" << 
-		"\t Path value: "<< end_n.get_reach_val() << std::endl;
 
-	return;
+
+	string info = "\nNumber of visited nodes: " + to_string(count_of_visited_nodes) + 
+				  "\nTime: " + to_string(duration.count()) + " ms";
+
+	if (end_n.get_reach_val() != INF)info = "Path status: found" + info + "\nPath value: " + to_string(end_n.get_reach_val());
+	else info = "Path status: not found" + info + "\nPath value: 0";
+
+
+	return info;
 }
 
 void Graph::reset_graph()
@@ -264,7 +269,11 @@ void Graph::reset_graph()
 
 void Graph::create_graph(int rows, int clms, int obstacles)
 {
-	this->delete_graph();
+	if (rows > 40 || rows < 2 || clms > 40 || clms < 2 ) throw "Error: Rows and columns should belong [2; 40]";
+	if (obstacles < 0) throw "Error: Number of obstacles cannot be negative";
+	if (rows * clms < obstacles) throw "Error: Too many obstacles";
+
+	this->delete_graph_info();
 
 	this->clms = clms; this->rows = rows;
 
@@ -354,7 +363,7 @@ void Graph::visualize()
 
 void Graph::write(ostream& save_graph)
 {
-	if (!m_nodes.size()) throw "writing empty graph";
+	if (!m_nodes.size()) throw "Error: Graph doesn't exist";
 	save_graph.write((char*)&rows, sizeof(rows));
 	save_graph.write((char*)&clms, sizeof(clms));
 
@@ -378,8 +387,12 @@ void Graph::read(istream& read_graph)
 	read_graph.read((char*)&clms, sizeof(clms));
 
 	//Error:invalid data
-	size_t size_n;
-	read_graph.read((char*)&size_n, sizeof(size_n)); if (size_n != (rows * clms) || size_n == 0) throw "invalid data";
+	size_t size_n = 0;
+	read_graph.read((char*)&size_n, sizeof(size_n)); 
+	
+	if (size_n == 0) throw "Error: File is empty";
+	if (size_n != (rows * clms)) throw "Error: Invalid data, couldn't read file";
+
 
 	vector<Node> nodes(size_n);
 	read_graph.read((char*)&nodes[0], size_n * sizeof(Node));
