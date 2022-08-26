@@ -1,2 +1,2 @@
 # Path-finding-algorithms
- Dijsktra, A* (with euclidian and manhattan heuristics)
+ Dijsktra, A* (with euclidean and manhattan heuristics)
